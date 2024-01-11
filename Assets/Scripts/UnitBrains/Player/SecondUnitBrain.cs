@@ -12,7 +12,7 @@ namespace UnitBrains.Player
         private float _temperature = 0f;
         private float _cooldownTime = 0f;
         private bool _overheated;
-        
+
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
@@ -40,24 +40,39 @@ namespace UnitBrains.Player
 
         protected override List<Vector2Int> SelectTargets()
         {
-            ///////////////////////////////////////
-            // Homework 1.4 (1st block, 4rd module)
-            ///////////////////////////////////////
             List<Vector2Int> result = GetReachableTargets();
+
+            List<Vector2Int> copyResult = new List<Vector2Int>(result);
+
+            float enemyWithMinDistanceToBaseValue = float.MaxValue;
+
+            foreach (Vector2Int res in copyResult)
+            {
+                float enemyDistanceToBaseValue = DistanceToOwnBase(res);
+
+                if (enemyDistanceToBaseValue < enemyWithMinDistanceToBaseValue)
+                {
+                    enemyWithMinDistanceToBaseValue = enemyDistanceToBaseValue;
+                    result.Clear();
+                    result.Add(res);
+                }
+
+            }
+
             while (result.Count > 1)
             {
                 result.RemoveAt(result.Count - 1);
             }
             return result;
-            ///////////////////////////////////////
+
         }
 
         public override void Update(float deltaTime, float time)
         {
             if (_overheated)
-            {              
+            {
                 _cooldownTime += Time.deltaTime;
-                float t = _cooldownTime / (OverheatCooldown/10);
+                float t = _cooldownTime / (OverheatCooldown / 10);
                 _temperature = Mathf.Lerp(OverheatTemperature, 0, t);
                 if (t >= 1)
                 {
@@ -69,7 +84,7 @@ namespace UnitBrains.Player
 
         private int GetTemperature()
         {
-            if(_overheated) return (int) OverheatTemperature;
+            if (_overheated) return (int)OverheatTemperature;
             else return (int)_temperature;
         }
 
