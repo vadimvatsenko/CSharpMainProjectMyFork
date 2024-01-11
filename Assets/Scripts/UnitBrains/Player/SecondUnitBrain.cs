@@ -20,7 +20,6 @@ namespace UnitBrains.Player
 
             if (temp >= overheatTemperature)
             {
-                Debug.Log("Перегрев");
                 return;
             }
 
