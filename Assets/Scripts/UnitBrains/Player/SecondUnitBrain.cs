@@ -41,26 +41,26 @@ namespace UnitBrains.Player
         {
             List<Vector2Int> result = GetReachableTargets();
 
-            List<Vector2Int> copyResult = new List<Vector2Int>(result);
-
             float enemyWithMinDistanceToBaseValue = float.MaxValue;
 
-            foreach (Vector2Int res in copyResult)
+            Vector2Int enemyUnitTargetPosition = Vector2Int.zero; // Переменная enemyUnitTarget изначально будет хранить нулевую позицию(x = 0, y = 0), с помощью цикла запишем самую близкую цель к базе в эту переменную
+
+            foreach (Vector2Int res in result)
             {
                 float enemyDistanceToBaseValue = DistanceToOwnBase(res);
 
                 if (enemyDistanceToBaseValue < enemyWithMinDistanceToBaseValue)
                 {
                     enemyWithMinDistanceToBaseValue = enemyDistanceToBaseValue;
-                    result.Clear();
-                    result.Add(res);
+                    enemyUnitTargetPosition = res; // В переменную enemyUnitTargetPosition записали самую близкую цель к базе
                 }
-
             }
 
-            while (result.Count > 1)
+            result.Clear(); // Очистка списка позиций всех вражеских целей
+
+            if (enemyWithMinDistanceToBaseValue < float.MaxValue) // Условие, если enemyWithMinDistanceToBaseValue меньше самому большому значению по float, добавь самую близкую цель для атаки
             {
-                result.RemoveAt(result.Count - 1);
+                result.Add(enemyUnitTargetPosition);
             }
             return result;
 
