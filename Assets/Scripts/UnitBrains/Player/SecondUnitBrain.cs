@@ -1,6 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using Model;
 using Model.Runtime.Projectiles;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace UnitBrains.Player
 {
@@ -31,39 +35,66 @@ namespace UnitBrains.Player
                 AddProjectileToList(projectile, intoList);
             }
         }
+  
 
         public override Vector2Int GetNextStep()
         {
-            return base.GetNextStep();
+
+            List<Vector2Int> targets = SelectTargets(); // получаем коллекцию самого опасного врага
+
+            Vector2Int moveToCurrentTarget = new(); // переменная, которая будет хранить позицию, куда должны идти Юниты
+
+            var baseTarget = runtimeModel.RoMap.Bases[
+                IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]; // позиция Вражеской базы, проверка
+
+            if(targets.Count > 0) // если есть цели в targets
+            {
+                foreach (var target in targets)
+                {
+                    if (!IsTargetInRange(target) && target != null) // если target самый близкий и не в зоне досягаемости, запиши цель в маршрут
+                    {
+                        moveToCurrentTarget = target;
+                    }
+                }
+            } else
+            {
+                moveToCurrentTarget = baseTarget; // в противном случае добавь в маршрут базу Врага.
+            }
+
+            return CalcNextStepTowards(moveToCurrentTarget); // расчёт маршрута
         }
+
 
         protected override List<Vector2Int> SelectTargets()
         {
-            List<Vector2Int> result = GetReachableTargets();
+  
+            List<Vector2Int> mostDangerousTarget = new List<Vector2Int>();   // список с самым опасным Врагом
 
-            float enemyWithMinDistanceToBaseValue = float.MaxValue;
+            Vector2Int mostDangerousTargetPosition = Vector2Int.zero; // позиция самого опасного врага
 
-            Vector2Int enemyUnitTargetPosition = Vector2Int.zero; // Переменная enemyUnitTarget изначально будет хранить нулевую позицию(x = 0, y = 0), с помощью цикла запишем самую близкую цель к базе в эту переменную
+            float enemyWithMinDistanceToBaseValue = float.MaxValue; // промежуточная переменная для хранения минимального расстояния от Врага к Базе
 
-            foreach (Vector2Int res in result)
+            foreach (Vector2Int dangerTarget in GetAllTargets()) // перебираем в цикле все вражеские цели на карте, метод GetAllTargets() получит все цели.
             {
-                float enemyDistanceToBaseValue = DistanceToOwnBase(res);
 
-                if (enemyDistanceToBaseValue < enemyWithMinDistanceToBaseValue)
+                float enemyDistanceToBaseValue = DistanceToOwnBase(dangerTarget); // промежуточная переменная для врага в которой будет хранится абсолютное расстояние от Врага к Базе
+
+                if (enemyDistanceToBaseValue < enemyWithMinDistanceToBaseValue) // условие, дистанция от нашей базы до врага меньше enemyWithMinDistanceToBaseValue
                 {
-                    enemyWithMinDistanceToBaseValue = enemyDistanceToBaseValue;
-                    enemyUnitTargetPosition = res; // В переменную enemyUnitTargetPosition записали самую близкую цель к базе
+                    enemyWithMinDistanceToBaseValue = enemyDistanceToBaseValue; // то, запишем эту дистанцию в enemyWithMinDistanceToBaseValue
+
+                    mostDangerousTargetPosition = dangerTarget; // позиция самого опасного врага, запишем её в Vector2Int mostDangerousTargetPosition
                 }
             }
 
-            result.Clear(); // Очистка списка позиций всех вражеских целей
+            mostDangerousTarget.Clear(); // очищаем коллекцию самого опасного Врага, перед записью.
 
-            if (enemyWithMinDistanceToBaseValue < float.MaxValue) // Условие, если enemyWithMinDistanceToBaseValue меньше самому большому значению по float, добавь самую близкую цель для атаки
+            if (enemyWithMinDistanceToBaseValue < float.MaxValue)
             {
-                result.Add(enemyUnitTargetPosition);
+                mostDangerousTarget.Add(mostDangerousTargetPosition); // добавляем в коллекцию самого опасного Врага
             }
-            return result;
 
+            return mostDangerousTarget; // возвращаем коллекцию
         }
 
         public override void Update(float deltaTime, float time)
