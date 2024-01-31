@@ -17,6 +17,8 @@ namespace UnitBrains.Player
         private float _cooldownTime = 0f;
         private bool _overheated;
 
+        private List<Vector2Int> _allCurrentTargets = new List<Vector2Int>(); // поле для всех опасных целей // ДЗ6
+
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
@@ -35,39 +37,23 @@ namespace UnitBrains.Player
                 AddProjectileToList(projectile, intoList);
             }
         }
-  
+
 
         public override Vector2Int GetNextStep()
         {
+            Vector2Int currentTarget = new(); // завел вспомагательную переменную в которой будут координаты самой опасной цели на данный момент
 
-            List<Vector2Int> targets = SelectTargets(); // получаем коллекцию самого опасного врага
-
-            Vector2Int moveToCurrentTarget = new(); // переменная, которая будет хранить позицию, куда должны идти Юниты
-
-            var baseTarget = runtimeModel.RoMap.Bases[
-                IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId]; // позиция Вражеской базы, проверка
-
-            if(targets.Count > 0) // если есть цели в targets
+            foreach (Vector2Int target in _allCurrentTargets)
             {
-                foreach (var target in targets)
-                {
-                    if (!IsTargetInRange(target) && target != null) // если target самый близкий и не в зоне досягаемости, запиши цель в маршрут
-                    {
-                        moveToCurrentTarget = target;
-                    }
-                }
-            } else
-            {
-                moveToCurrentTarget = baseTarget; // в противном случае добавь в маршрут базу Врага.
+                currentTarget = target;
             }
-
-            return CalcNextStepTowards(moveToCurrentTarget); // расчёт маршрута
+            return CalcNextStepTowards(currentTarget); // передаем юнита или базу, в зависимости, что передано в _allCurrentTarge с метода SelectTargets()
         }
 
 
         protected override List<Vector2Int> SelectTargets()
         {
-  
+
             List<Vector2Int> mostDangerousTarget = new List<Vector2Int>();   // список с самым опасным Врагом
 
             Vector2Int mostDangerousTargetPosition = Vector2Int.zero; // позиция самого опасного врага
@@ -87,14 +73,29 @@ namespace UnitBrains.Player
                 }
             }
 
-            mostDangerousTarget.Clear(); // очищаем коллекцию самого опасного Врага, перед записью.
+            _allCurrentTargets.Clear(); // очистка верхнего списка, тот, что в шапке(в общей области видимости)
 
-            if (enemyWithMinDistanceToBaseValue < float.MaxValue)
+            if (enemyWithMinDistanceToBaseValue < float.MaxValue) // грубо говоря, если есть цель, то выполни условие
             {
-                mostDangerousTarget.Add(mostDangerousTargetPosition); // добавляем в коллекцию самого опасного Врага
+                _allCurrentTargets.Add(mostDangerousTargetPosition); // самую опасную цель, добавим в список _allCurrentTargets, что вверху в общей видимости
+
+                if (IsTargetInRange(mostDangerousTargetPosition)) // если самый опасный враг в области видимости, 
+                {
+                    mostDangerousTarget.Add(mostDangerousTargetPosition); // то добавим его в список mostDangerousTarget и вернём его для атаки
+                }
+            }
+            else // если цели не найдены, то передай локацию Вражеской базы
+            {
+                if (IsPlayerUnitBrain)
+                {
+                    var enemyBaseTarget = runtimeModel.RoMap.Bases[
+                IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId];
+                    _allCurrentTargets.Add(enemyBaseTarget);
+                }
             }
 
-            return mostDangerousTarget; // возвращаем коллекцию
+            return mostDangerousTarget;
+
         }
 
         public override void Update(float deltaTime, float time)
