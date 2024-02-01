@@ -41,13 +41,25 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            Vector2Int currentTarget = new(); // завел вспомагательную переменную в которой будут координаты самой опасной цели на данный момент
+            Vector2Int currentTarget = Vector2Int.zero; // завел вспомогательную переменную в которой будут координаты самой опасной цели на данный момент, по умолчанию будет x=0, y=0
 
-            foreach (Vector2Int target in _allCurrentTargets)
+            if (_allCurrentTargets.Count > 0)
             {
-                currentTarget = target;
+                currentTarget = _allCurrentTargets[0]; // если список _allCurrentTargets не пуст, присвой координаты цели со списка _allCurrentTargets под индексом 0 (так как он там единственный)
             }
-            return CalcNextStepTowards(currentTarget); // передаем юнита или базу, в зависимости, что передано в _allCurrentTarge с метода SelectTargets()
+            else
+            {
+                currentTarget = unit.Pos; // если список пуст, то присвой координаты самого себя, стой на месте, совершай выстрелы на расстоянии.
+            }
+
+            if (IsTargetInRange(currentTarget)) // если цель в зоне досягаемости, то стой на месте. вернёт позицию самого юнита. Атака на расстоянии.
+            {
+                return unit.Pos; // позиция самого себя(юнита)
+            }
+            else
+            {
+                return CalcNextStepTowards(currentTarget); // в противном случае верни позицию самого опасного врага к которому нужно ехать
+            }
         }
 
 
