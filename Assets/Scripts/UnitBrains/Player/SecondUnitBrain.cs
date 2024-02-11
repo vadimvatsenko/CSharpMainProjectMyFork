@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Model;
 using Model.Runtime.Projectiles;
@@ -17,15 +18,11 @@ namespace UnitBrains.Player
         private bool _overheated;
 
         // ДЗ-7
-        private const int MAXTARGETSFORATTACK = 4; // максимально число юнитов для атаки 
+        private const int MaxTargetsForAttack = 4; // максимально число юнитов для атаки 
         private static int _playerIdCount = 0; // счётчик ID
-        private int _playerUnitId; // id SecondUnitBrain
-        public static int unitIndexer = 0;
+        private int _playerUnitId = _playerIdCount++; // нам не нужно создавать конструктор, можно просто внести в переменную // ??? // почему именно такая реализация???
         private List<Vector2Int> _targetsToMove = new List<Vector2Int>(); // поле для всех опасных целей // ДЗ-6
-        public SecondUnitBrain() // конструктор для создания ID
-        {
-            _playerUnitId = _playerIdCount++;
-        }
+
 
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
@@ -73,63 +70,48 @@ namespace UnitBrains.Player
 
         protected override List<Vector2Int> SelectTargets()
         {
-            List<Vector2Int> _allTargets = new List<Vector2Int>();
-            List<Vector2Int> _targetsForAttack = new List<Vector2Int>();
-            int indexCurrentTargetForAttack = _playerUnitId % MAXTARGETSFORATTACK;
+            List<Vector2Int> _allTargets = new List<Vector2Int>(); // список всех целей
+            List<Vector2Int> _targetsForAttack = new List<Vector2Int>(); // список целей для атаки
 
-            _targetsToMove.Clear();
-            _allTargets.Clear();
+            int indexCurrentTargetForAttack = _playerUnitId % MaxTargetsForAttack; // расчёт индекса, почему такая формула? 
 
-            foreach (var target in GetAllTargets())
+            Vector2Int closestTarget = new(); // координаты ближайший цели
+
+            int minWeight = int.MaxValue; // расскажи про вес?
+
+            foreach (var target in GetAllTargets()) // перебор всех целей, GetAllTargets() получает все цели
             {
-                _allTargets.Add(target);
+                _allTargets.Add(target); // заполняем список всеми целями
             }
 
-            SortByDistanceToOwnBase(_allTargets);
+            SortByDistanceToOwnBase(_allTargets); // сортируем по возрастанию цели
 
-            Debug.Log(_playerUnitId);
-
-            if (_allTargets.Count == 1)
+            for (int i = 0; i < _allTargets.Count; i++) // перебираем все цели
             {
-                if (IsTargetInRange(_allTargets[0]))
+                int weight = Math.Abs(i - indexCurrentTargetForAttack); // Math.Abs - это модуль
+
+                if (IsTargetInRange(_allTargets[i]))
                 {
-                _targetsForAttack.Add(_allTargets[0]);
-                } 
+                    if (weight < minWeight)
+                    {
+                        minWeight = weight;
+                        closestTarget = _allTargets[i];
+                        _targetsForAttack.Add(closestTarget);
+                    }
+                }
+
                 else
                 {
-                    _targetsToMove.Add(_allTargets[0]);
+                    _targetsToMove.Add(_allTargets[i]);
                 }
             }
 
-            else if (_allTargets.Count == 0 && IsPlayerUnitBrain)
+
+            if (_allTargets.Count == 1)
             {
                 var enemyBaseTarget = runtimeModel.RoMap.Bases[
                 IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId];
                 _targetsForAttack.Add(enemyBaseTarget);
-            }
-
-            else if (_allTargets.Count > 1)
-            {
-                int index = indexCurrentTargetForAttack - 1;
-
-                if (index < 0)
-                {
-                    index = 0; // Если индекс отрицательный, устанавливаем его в 0
-                }
-                else if(index >= _allTargets.Count)
-                {
-                    index = 0; // Если индекс больше или равен количеству элементов в списке, устанавливаем его в индекс 1й элемент
-                }
-
-                if (IsTargetInRange(_allTargets[index]))
-                {
-                    _targetsForAttack.Add(_allTargets[index]);
-                }
-                else
-                {
-                    _targetsToMove.Add(_allTargets[index]);
-                }
-
             }
 
             return _targetsForAttack;
