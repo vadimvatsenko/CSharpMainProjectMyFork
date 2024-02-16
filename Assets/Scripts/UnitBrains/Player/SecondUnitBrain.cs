@@ -45,7 +45,7 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            Vector2Int currentTarget = Vector2Int.zero; // завел вспомогательную переменную в которой будут координаты самой опасной цели на данный момент, по умолчанию будет x=0, y=0
+            /*Vector2Int currentTarget = Vector2Int.zero; // завел вспомогательную переменную в которой будут координаты самой опасной цели на данный момент, по умолчанию будет x=0, y=0
 
             if (_targetsToMove.Count > 0)
             {
@@ -63,7 +63,8 @@ namespace UnitBrains.Player
             else
             {
                 return CalcNextStepTowards(currentTarget); // в противном случае верни позицию самого опасного врага к которому нужно ехать
-            }
+            }*/
+            return base.GetNextStep();
 
         }
 
