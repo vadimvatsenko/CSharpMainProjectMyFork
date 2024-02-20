@@ -11,6 +11,8 @@ public class ThirdUnitBrain : DefaultPlayerUnitBrain
 {
     public override string TargetUnitName => "Ironclad Behemoth";
     bool isMoving = true;
+    bool isShooting = false;
+
     private float stopTimer = 0f; 
     private float stopDuration = 1f; 
 
@@ -39,11 +41,12 @@ public class ThirdUnitBrain : DefaultPlayerUnitBrain
         } 
     }
 
-    public void ChangeState()
+    private void ChangeState()
     {
-       
+
         if (!HasTargetsInRange())
         {
+
             stopTimer += Time.deltaTime;
             if (stopTimer > stopDuration)
             {
@@ -51,15 +54,17 @@ public class ThirdUnitBrain : DefaultPlayerUnitBrain
                 stopTimer = 0f;
             }
         }
+
         else
         {
             stopTimer += Time.deltaTime;
-            if (stopTimer < stopDuration)
+            if (stopTimer > stopDuration) // 
             {
                 isMoving = false;
                 stopTimer = 0f;
             }
         }
+
     }
 
     public override void Update(float deltaTime, float time)
@@ -68,9 +73,11 @@ public class ThirdUnitBrain : DefaultPlayerUnitBrain
 
         ChangeState();
 
-        Debug.Log(stopTimer);
+        //Debug.Log(stopTimer);
 
-        Debug.Log(isMoving);
+        //Debug.Log($"isMoving: { isMoving}");
+        //Debug.Log($"isShooting: {isShooting}");
+        Debug.Log($"in range: {HasTargetsInRange()}");
     }
 }
 
