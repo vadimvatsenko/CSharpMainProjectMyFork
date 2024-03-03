@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnitBrains.Player
 {
-    public class SecondUnitBrain : DefaultPlayerUnitBrain
+    public class SecondUnitBrain : DefaultPlayerUnitBrain // DefaultPlayerUnitBrain - базовый класс для всех юнитов игрока
     {
         public override string TargetUnitName => "Cobra Commando";
         private const float OverheatTemperature = 3f;

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.UnitBrains.Pathfinding;
 using Model;
 using Model.Runtime.Projectiles;
 using Model.Runtime.ReadOnly;
@@ -10,16 +11,17 @@ using Unit = Model.Runtime.Unit;
 
 namespace UnitBrains
 {
-    public abstract class BaseUnitBrain
+    public abstract class BaseUnitBrain // BaseUnitBrain - базовый класс для всех юнитов
     {
         public virtual string TargetUnitName => string.Empty;
-        public virtual bool IsPlayerUnitBrain => true;
-        public virtual BaseUnitPath ActivePath => _activePath;
+        public virtual bool IsPlayerUnitBrain => true; // принадлежит ли юнит игроку
+        public virtual BaseUnitPath ActivePath => _activePath; // активный путь по которому сейчас идёт юнит
         
-        protected Unit unit { get; private set; }
-        protected IReadOnlyRuntimeModel runtimeModel => ServiceLocator.Get<IReadOnlyRuntimeModel>();
-        private BaseUnitPath _activePath = null;
-        
+        protected Unit unit { get; private set; } // ссылка на самого юнита, которому принадлежит BaseUnitBrain
+        protected IReadOnlyRuntimeModel runtimeModel => ServiceLocator.Get<IReadOnlyRuntimeModel>(); // все данные по текущей игровой сессии
+
+        private BaseUnitPath _activePath = null; // получаем к нему доступ через свойство public virtual BaseUnitPath ActivePath => _activePath;
+
         private readonly Vector2[] _projectileShifts = new Vector2[]
         {
             new (0f, 0f),
@@ -39,8 +41,9 @@ namespace UnitBrains
             var target = runtimeModel.RoMap.Bases[
                 IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId];
 
-            _activePath = new DummyUnitPath(runtimeModel, unit.Pos, target);
-            return _activePath.GetNextStepFrom(unit.Pos);
+            _activePath = new AStar(runtimeModel, unit.Pos, target);
+            //_activePath = new DummyUnitPath(runtimeModel, unit.Pos, target);
+            return _activePath.GetNextStepFrom(unit.Pos); // передается текущая позиция юнита и он возвращает куда идти
         }
 
         public List<BaseProjectile> GetProjectiles()
@@ -65,7 +68,7 @@ namespace UnitBrains
             this.unit = unit;
         }
 
-        public virtual void Update(float deltaTime, float time)
+        public virtual void Update(float deltaTime, float time) // можно переопределить для создания доп логики
         {
         }
 
@@ -74,7 +77,7 @@ namespace UnitBrains
             AddProjectileToList(CreateProjectile(forTarget), intoList);
         }
 
-        protected virtual List<Vector2Int> SelectTargets()
+        protected virtual List<Vector2Int> SelectTargets() // 
         {
             var result = GetReachableTargets();
             while (result.Count > 1)

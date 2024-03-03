@@ -5,7 +5,7 @@ using Utilities;
 
 namespace UnitBrains.Pathfinding
 {
-    public class DummyUnitPath : BaseUnitPath
+    public class DummyUnitPath : BaseUnitPath 
     {
         private const int MaxLength = 100;
         
@@ -13,7 +13,7 @@ namespace UnitBrains.Pathfinding
         {
         }
 
-        protected override void Calculate()
+        protected override void Calculate() // тут расчёт пути самым примитивным способом
         {
             var currentPoint = startPoint;
             var result = new List<Vector2Int> { startPoint };
@@ -28,13 +28,13 @@ namespace UnitBrains.Pathfinding
                 currentPoint = nextStep;
             }
 
-            path = result.ToArray();
+            path = result.ToArray(); // результат записываем в path обязательно
         }
         
         private Vector2Int CalcNextStepTowards(Vector2Int fromPos, Vector2Int toPos)
         {
             var diff = toPos - fromPos;
-            var stepDiff = diff.SignOrZero();
+            var stepDiff = diff.SignOrZero(); // важный метод 
             var nextStep = fromPos + stepDiff;
 
             if (runtimeModel.IsTileWalkable(nextStep))

@@ -4,35 +4,34 @@ using UnityEngine;
 
 namespace UnitBrains.Pathfinding
 {
-    public abstract class BaseUnitPath
+    public abstract class BaseUnitPath // базовый класс для всех путей // расчёт пути от точки до точки
     {
-        public Vector2Int StartPoint => startPoint;
-        public Vector2Int EndPoint => endPoint;
+        public Vector2Int StartPoint => startPoint; // стартовая точка
+        public Vector2Int EndPoint => endPoint; // конечная точка
         
-        protected readonly IReadOnlyRuntimeModel runtimeModel;
+        protected readonly IReadOnlyRuntimeModel runtimeModel; // является ли клетка проходимой
         protected readonly Vector2Int startPoint;
         protected readonly Vector2Int endPoint;
-        protected Vector2Int[] path = null;
-
-        protected abstract void Calculate();
+        protected Vector2Int[] path = null; // массив из тайлов или клеток на карте
+        protected abstract void Calculate(); // метод для просчёта путей
         
         public IEnumerable<Vector2Int> GetPath()
         {
             if (path == null)
-                Calculate();
+                Calculate(); // тут вызывается
             
             return path;
         }
 
-        public Vector2Int GetNextStepFrom(Vector2Int unitPos)
+        public Vector2Int GetNextStepFrom(Vector2Int unitPos) // возвращает следующую ячейку от позиции
         {
             var found = false;
-            foreach (var cell in GetPath())
+            foreach (var cell in GetPath()) // проходим по всем клеткам
             {
                 if (found)
-                    return cell;
+                    return cell; // вернули следующую клетку
 
-                found = cell == unitPos;
+                found = cell == unitPos; // ищем клетку которая равна позиции игрока
             }
 
             Debug.LogError($"Unit {unitPos} is not on the path");

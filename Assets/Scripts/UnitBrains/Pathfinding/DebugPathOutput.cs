@@ -30,8 +30,9 @@ namespace UnitBrains.Pathfinding
             highlightCoroutine = StartCoroutine(HighlightCoroutine(path));
         }
 
-        private IEnumerator HighlightCoroutine(BaseUnitPath path)
+        private IEnumerator HighlightCoroutine(BaseUnitPath path) // логика для прорисовки пути
         {
+            
             // TODO Implement me
             yield break;
         }

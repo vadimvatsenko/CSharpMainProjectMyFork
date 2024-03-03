@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace UnitBrains.Player
 {
-    public class DefaultPlayerUnitBrain : BaseUnitBrain
+    public class DefaultPlayerUnitBrain : BaseUnitBrain // BaseUnitBrain - базовый класс для всех юнитов
     {
         protected float DistanceToOwnBase(Vector2Int fromPos) =>
             Vector2Int.Distance(fromPos, runtimeModel.RoMap.Bases[RuntimeModel.PlayerId]);

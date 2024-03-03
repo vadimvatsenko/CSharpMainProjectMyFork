@@ -16,7 +16,7 @@ namespace Model.Runtime
         public Vector2Int Pos { get; private set; }
         public int Health { get; private set; }
         public bool IsDead => Health <= 0;
-        public BaseUnitPath ActivePath => _brain?.ActivePath;
+        public BaseUnitPath ActivePath => _brain?.ActivePath; // ?
         public IReadOnlyList<BaseProjectile> PendingProjectiles => _pendingProjectiles;
 
         private readonly List<BaseProjectile> _pendingProjectiles = new();
@@ -70,9 +70,9 @@ namespace Model.Runtime
             return true;
         }
 
-        private void Move()
+        private void Move() // метод движения
         {
-            var targetPos = _brain.GetNextStep();
+            var targetPos = _brain.GetNextStep(); // метод спрашивает у _brain куда идти
             var delta = targetPos - Pos;
             if (delta.sqrMagnitude > 2)
             {
