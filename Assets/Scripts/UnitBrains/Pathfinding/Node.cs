@@ -4,20 +4,22 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
-    public Vector2Int Pos; // позиция нашей ноды
+    public int X;
+    public int Y;
     public int Cost = 10;
     public int Estimate;
     public int Value;
     public Node Parent;
 
-    public Node(Vector2Int pos)
+    public Node(int x, int y)
     {
-        Pos = pos;
+        X = x;
+        Y = y;
     }
 
-    public void CalculateEstimate(Vector2Int targetPos)
+    public void CalculateEstimate(int targetX, int targetY)
     {
-        Estimate = Mathf.Abs(Pos.x - targetPos.x) + Mathf.Abs(Pos.y - targetPos.y);
+        Estimate = Mathf.Abs(X - targetX) + Mathf.Abs(Y - targetY);
     }
 
     public void CalculateValue()
@@ -27,9 +29,9 @@ public class Node : MonoBehaviour
 
     public override bool Equals(object? obj)
     {
-        if(obj is not Node node) return false;
+        if (obj is not Node node) return false;
 
-        return Pos.x == node.Pos.x && Pos.y == node.Pos.y;
+        return X == node.X && Y == node.Y;
 
     }
 }
