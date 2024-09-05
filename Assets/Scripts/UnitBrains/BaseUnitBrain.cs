@@ -17,7 +17,7 @@ namespace UnitBrains
         public virtual bool IsPlayerUnitBrain => true; // принадлежит ли юнит игроку
         public virtual BaseUnitPath ActivePath => _activePath; // активный путь по которому сейчас идёт юнит, это свойство которое возращает значение ниже - private BaseUnitPath _activePath = null
         protected Unit unit { get; private set; } // ссылка на самого юнита, которому пренадлежить unit
-        protected IReadOnlyRuntimeModel runtimeModel => ServiceLocator.Get<IReadOnlyRuntimeModel>(); // в runtimeModel находятся все данные по текущей игровой сесии
+        protected IReadOnlyRuntimeModel runtimeModel => ServiceLocator.Get<IReadOnlyRuntimeModel>(); // в runtimeModel находятся все данные по текущей игровой сессии
         private BaseUnitPath _activePath = null;
         
         private readonly Vector2[] _projectileShifts = new Vector2[]
@@ -41,7 +41,6 @@ namespace UnitBrains
 
             _activePath = new AStarPathFinding(runtimeModel, unit.Pos, target); // активный путь
             //_activePath = new DummyUnitPath(runtimeModel, unit.Pos, target); // активный путь
-            //_activePath = new SmartUnitPath(runtimeModel, unit.Pos, target);
             return _activePath.GetNextStepFrom(unit.Pos); 
         }
 

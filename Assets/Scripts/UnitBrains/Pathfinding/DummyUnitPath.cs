@@ -56,7 +56,7 @@ namespace UnitBrains.Pathfinding
             }
 
             var sideStep0 = fromPos + new Vector2Int(stepDiff.y, -stepDiff.x);
-            var shiftedStep0 = fromPos + (sideStep0 + stepDiff).SignOrZero(); // еденичный вектор
+            var shiftedStep0 = fromPos + (sideStep0 + stepDiff).SignOrZero(); // единичный вектор
             if (runtimeModel.IsTileWalkable(shiftedStep0))
                 return shiftedStep0;
             

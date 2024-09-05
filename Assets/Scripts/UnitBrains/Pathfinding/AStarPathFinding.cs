@@ -10,26 +10,21 @@ public class AStarPathFinding : BaseUnitPath
 {
     private int[] dx = { -1, 0, 1, 0 };
     private int[] dy = { 0, 1, 0, -1 };
+    private int maxLength => runtimeModel.RoMap.Width * runtimeModel.RoMap.Height;
 
     public AStarPathFinding(IReadOnlyRuntimeModel runtimeModel, Vector2Int startPoint, Vector2Int endPoint) : base(runtimeModel, startPoint, endPoint)
-    {
-        
+    {       
     }
 
     protected override void Calculate()
     {
-        List<Nodes> pathList = FindPath();
-
-        if (pathList == null || pathList.Count == 0)
-        {
-            Debug.LogError("Path not found");
-            return;
-        }
-
-        path = FindPath().Select(p => new Vector2Int(p.x, p.y)).ToArray();
+        List<Vector2Int> pathList = FindPath();
+        
+        path = pathList.ToArray();
+       
     }
 
-    public List<Nodes> FindPath()
+    public List<Vector2Int> FindPath()
     {
         Nodes startNode = new Nodes(startPoint.x, startPoint.y);
         Nodes targetNode = new Nodes(endPoint.x, endPoint.y);
@@ -43,25 +38,23 @@ public class AStarPathFinding : BaseUnitPath
             
             foreach(Nodes node in openList)
             {                              
-                if (node.value < targetNode.value) currentNode = node;              
+                if (node.value < currentNode.value) currentNode = node;              
             }
 
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
-            if(currentNode.x == targetNode.x && currentNode.y == targetNode.y || closedList.Count > runtimeModel.RoMap.Width * runtimeModel.RoMap.Height)
-            {
-                
-                List<Nodes> newPath = new List<Nodes>();
+            if(currentNode.x == targetNode.x && currentNode.y == targetNode.y || closedList.Count > maxLength)
+            {               
+                List<Vector2Int> newPath = new List<Vector2Int>();
                 
                 while (currentNode != null)
                 {
-                    newPath.Add(currentNode);
-                    Debug.Log("Add pathNode");
+                    newPath.Add(new Vector2Int(currentNode.x, currentNode.y));
                     currentNode = currentNode.parent;
                 }
 
-                path.Reverse();
+                newPath.Reverse();
                 return newPath;
             }
 
@@ -80,11 +73,7 @@ public class AStarPathFinding : BaseUnitPath
                     neighbor.CalculateEstimate(targetNode.x, targetNode.y);
                     neighbor.CalculateValue();
 
-                    if (!openList.Contains(neighbor))
-                    {
-                        openList.Add(neighbor);
-                    }
-                    
+                    openList.Add(neighbor);                    
                 }
             }
 
@@ -97,7 +86,7 @@ public class AStarPathFinding : BaseUnitPath
         bool isValidX = cell.x >=0 && cell.x < runtimeModel.RoMap.Width;
         bool isValidY = cell.y >=0 && cell.y < runtimeModel.RoMap.Height;
 
-        return isValidX && isValidY && (runtimeModel.IsTileWalkable(cell));
+        return isValidX && isValidY && runtimeModel.IsTileWalkable(cell);
     }
 
 }
