@@ -67,7 +67,7 @@ public class AStarPathFinding : BaseUnitPath
                 {
                     Nodes neighbor = new Nodes(newX, newY);
 
-                    if (closedList.Contains(neighbor)) continue;
+                    if (openList.Contains(neighbor)) continue;
 
                     neighbor.parent = currentNode;
                     neighbor.CalculateEstimate(targetNode.x, targetNode.y);
