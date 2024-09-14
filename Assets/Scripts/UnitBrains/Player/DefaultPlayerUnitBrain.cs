@@ -3,6 +3,8 @@ using Model;
 using Model.Runtime.Projectiles;
 using UnityEngine;
 
+// тут нужно переопределить логику поведения юнитов // переопределяем public virtual Vector2Int GetNextStep()
+// если юнит находится в 3х клетках от рекомендации, то не реагировать на рекомендации
 namespace UnitBrains.Player
 {
     public class DefaultPlayerUnitBrain : BaseUnitBrain
