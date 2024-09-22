@@ -9,21 +9,17 @@ public class RecommendationsForUnitsSingleton
 {
     public IReadOnlyRuntimeModel _runtimeModel { get; private set; }
     private TimeUtil _timeUtil;
-    public Vector2Int _playerBasePos { get; private set; }
-    public Vector2Int _enemyBasePos { get; private set; }
-
     private event Action UpdateRuntimeModelEvent;
 
     public RecommendationsForUnitsSingleton(RuntimeModel runtimeModel, TimeUtil timeUtil)
     {
-        _runtimeModel = _runtimeModel;
+        _runtimeModel = runtimeModel;
         _timeUtil = timeUtil;
+        
         UpdateRuntimeModelEvent += UpdateRuntimeModel;
 
         _timeUtil.AddFixedUpdateAction(UpdateRuntimeModelWrapperForEvent);
 
-        _playerBasePos = _runtimeModel.RoMap.Bases[RuntimeModel.PlayerId];
-        _enemyBasePos = _runtimeModel.RoMap.Bases[RuntimeModel.BotPlayerId];
     }
     ~RecommendationsForUnitsSingleton()
     {
@@ -49,7 +45,11 @@ public class RecommendationsForUnitsSingleton
 
     public Vector2Int RecommendationTarget()
     {
-        Vector2Int centerPointBetweenBases = _playerBasePos + (_playerBasePos - _enemyBasePos) / 2; // центр карты
+        Vector2Int playerBasePos = _runtimeModel.RoMap.Bases[RuntimeModel.PlayerId];
+        Vector2Int enemyBasePos = _runtimeModel.RoMap.Bases[RuntimeModel.BotPlayerId];
+
+        Vector2Int centerPointBetweenBases = playerBasePos + (playerBasePos - enemyBasePos) / 2; // центр карты
+        
         float minEnemyHealth = float.MaxValue; // минимальное здоровье врага
         Vector2Int targetPos = Vector2Int.zero; // целевая позиция
 

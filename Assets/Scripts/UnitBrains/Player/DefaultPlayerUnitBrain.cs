@@ -29,8 +29,7 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            
-            var target = RecommendationsForUnitsSingleton.GetInstance().RecommendationTarget();
+            var target = _recommendationsForUnitsSingleton.RecommendationTarget(); // поменял на свойство поля
 
             if(Vector2Int.Distance(unit.Pos, target) > 5f)
             {
@@ -38,7 +37,7 @@ namespace UnitBrains.Player
                 Debug.Log("No reaction");
             } else
             {
-                target = RecommendationsForUnitsSingleton.GetInstance().RecommendationTarget();
+                target = _recommendationsForUnitsSingleton.RecommendationTarget(); // поменял на свойство поля
                 Debug.Log("Singleton reaction");
             }
 

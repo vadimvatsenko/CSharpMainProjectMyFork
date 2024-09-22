@@ -19,7 +19,9 @@ namespace UnitBrains
         protected Unit unit { get; private set; }
         protected IReadOnlyRuntimeModel runtimeModel => ServiceLocator.Get<IReadOnlyRuntimeModel>();
         private BaseUnitPath _activePath = null;
-        
+
+        protected RecommendationsForUnitsSingleton _recommendationsForUnitsSingleton; // 6. Создано поле локатора, его унаследует DefaultPlayerUnitBrain
+
         private readonly Vector2[] _projectileShifts = new Vector2[]
         {
             new (0f, 0f),
@@ -60,9 +62,10 @@ namespace UnitBrains
             return result;
         }
 
-        public void SetUnit(Unit unit)
+        public void SetUnit(Unit unit, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // test
         {
             this.unit = unit;
+            _recommendationsForUnitsSingleton = recommendationsForUnitsSingleton; // test
         }
 
         public virtual void Update(float deltaTime, float time)
