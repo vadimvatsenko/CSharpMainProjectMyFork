@@ -14,11 +14,10 @@ public class RecommendationsForUnitsSingleton
 
     private event Action UpdateRuntimeModelEvent;
 
-    private static RecommendationsForUnitsSingleton _instance;
-    private RecommendationsForUnitsSingleton()
+    public RecommendationsForUnitsSingleton(RuntimeModel runtimeModel, TimeUtil timeUtil)
     {
-        _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
-        _timeUtil = ServiceLocator.Get<TimeUtil>();
+        _runtimeModel = _runtimeModel;
+        _timeUtil = timeUtil;
         UpdateRuntimeModelEvent += UpdateRuntimeModel;
 
         _timeUtil.AddFixedUpdateAction(UpdateRuntimeModelWrapperForEvent);
@@ -35,16 +34,6 @@ public class RecommendationsForUnitsSingleton
     {
         _timeUtil.RemoveFixedUpdateAction(UpdateRuntimeModelWrapperForEvent);
         UpdateRuntimeModelEvent -= UpdateRuntimeModel;
-    }
-
-    public static RecommendationsForUnitsSingleton GetInstance()
-    {
-        if (_instance == null)
-        {
-            _instance = new RecommendationsForUnitsSingleton();
-        }
-
-        return _instance;
     }
 
     public void UpdateRuntimeModelWrapperForEvent(float time) // обвертка
