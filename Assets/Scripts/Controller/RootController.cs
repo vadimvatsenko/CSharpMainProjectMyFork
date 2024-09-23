@@ -4,6 +4,8 @@ using UnityEngine;
 using Utilities;
 using View;
 
+// регистрации сервисов происходят тут в RootController
+// системы создаются или передаются из вне
 namespace Controller
 {
     public class RootController
@@ -11,6 +13,8 @@ namespace Controller
         private readonly PersistedModel _persisted;
         private readonly RuntimeModel _runtimeModel;
         private readonly LevelController _levelController;
+        
+        private readonly BuffService _buffService;
         
         private RootView _rootView;
 
@@ -34,6 +38,10 @@ namespace Controller
             _levelController = new(_runtimeModel, this);
             
             _rootView.ShowStartMenu();
+
+            // запись системы
+            _buffService = new BuffService();
+            ServiceLocator.Register(_buffService);
         }
 
         public void RestartGame()

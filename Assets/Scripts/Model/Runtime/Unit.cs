@@ -26,7 +26,11 @@ namespace Model.Runtime
         private float _nextBrainUpdateTime = 0f;
         private float _nextMoveTime = 0f;
         private float _nextAttackTime = 0f;
-        
+
+        //
+        private BuffService _buffService => ServiceLocator.Get<BuffService>();
+        //
+
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
         {
             Config = config;
@@ -50,12 +54,14 @@ namespace Model.Runtime
             
             if (_nextMoveTime < time)
             {
+               
                 _nextMoveTime = time + Config.MoveDelay;
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
+                float timeScaller = _buffService.AddBuff(this, new MoveFasterBuff(10));
                 _nextAttackTime = time + Config.AttackDelay;
             }
         }

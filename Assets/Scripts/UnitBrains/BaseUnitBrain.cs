@@ -21,6 +21,7 @@ namespace UnitBrains
         private BaseUnitPath _activePath = null;
 
         protected RecommendationsForUnitsSingleton _recommendationsForUnitsSingleton; // 6. Создано поле локатора, его унаследует DefaultPlayerUnitBrain
+        
 
         private readonly Vector2[] _projectileShifts = new Vector2[]
         {
@@ -62,10 +63,10 @@ namespace UnitBrains
             return result;
         }
 
-        public void SetUnit(Unit unit, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // test
+        public void SetUnit(Unit unit, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 7. Добавлена зависимость
         {
             this.unit = unit;
-            _recommendationsForUnitsSingleton = recommendationsForUnitsSingleton; // test
+            _recommendationsForUnitsSingleton = recommendationsForUnitsSingleton; // 8. Записываем локатор
         }
 
         public virtual void Update(float deltaTime, float time)

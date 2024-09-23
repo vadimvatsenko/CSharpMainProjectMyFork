@@ -29,16 +29,16 @@ namespace UnitBrains.Player
 
         public override Vector2Int GetNextStep()
         {
-            var target = _recommendationsForUnitsSingleton.RecommendationTarget(); // поменял на свойство поля
+            var target = _recommendationsForUnitsSingleton.RecommendationTarget(); // 9.поменял на свойство поля
 
             if(Vector2Int.Distance(unit.Pos, target) > 5f)
             {
                 target = base.GetNextStep();
-                Debug.Log("No reaction");
+                //Debug.Log("No reaction");
             } else
             {
-                target = _recommendationsForUnitsSingleton.RecommendationTarget(); // поменял на свойство поля
-                Debug.Log("Singleton reaction");
+                target = _recommendationsForUnitsSingleton.RecommendationTarget(); // 10.поменял на свойство поля
+                //Debug.Log("Singleton reaction");
             }
 
             if (HasTargetsInRange())

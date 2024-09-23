@@ -53,7 +53,6 @@ namespace Controller
             _gameplayView.Reinitialize();
 
             _recommendationsForUnitsSingleton = new RecommendationsForUnitsSingleton(_runtimeModel, _timeUtil); // 2. Создан экземпляр локатора
-            Debug.Log(_recommendationsForUnitsSingleton.RecommendationTarget());
         }
 
         public void OnPlayersUnitChosen(UnitConfig unitConfig)
