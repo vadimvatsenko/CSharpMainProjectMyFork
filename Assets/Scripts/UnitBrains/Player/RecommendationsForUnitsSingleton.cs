@@ -60,7 +60,7 @@ public class RecommendationsForUnitsSingleton
             
             if (distance <= centerPointBetweenBases.magnitude)
             {
-                Debug.Log($"Enemy with pos = {enemy.Pos} on my side");
+                //Debug.Log($"Enemy with pos = {enemy.Pos} on my side");
                 return enemy.Pos; // ¬озвращаем позицию врага на стороне игрока
             }
 

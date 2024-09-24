@@ -1,19 +1,20 @@
-using Model.Config;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveFasterBuff : IBuff
+public class ShootFasterBuff : IBuff
 {
     private float _indexSpeed;
-    public MoveFasterBuff(int indexSpeed)
+
+    public ShootFasterBuff(float indexSpeed)
     {
         _indexSpeed = indexSpeed;
     }
+
     public Modifers ApplyBuff(Modifers config)
     {
         Modifers newConfig = config;
-        newConfig.MovementAcceleration += _indexSpeed;
+        newConfig.AttackAcceleration += _indexSpeed;
         return newConfig;
     }
 }

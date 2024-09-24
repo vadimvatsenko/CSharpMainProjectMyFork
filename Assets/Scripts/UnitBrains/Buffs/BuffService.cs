@@ -11,27 +11,27 @@ using UnityEngine;
 
 public class BuffService: IBuffable
 {
-    public UnitConfig _baseStates { get; }
-    public UnitConfig _currentStates { get; private set; }
-
-    Dictionary<BaseUnitBrain, IBuff> _buffs = new Dictionary<BaseUnitBrain, IBuff>();
-    public BuffService()
+    public Modifers _baseStates { get; }
+    public Modifers _currentStates { get; private set; }
+    public Dictionary<BaseUnitBrain, IBuff> _buffs {  get; private set; }
+    public BuffService(Modifers modifers)
     {
-        _baseStates = MonoBehaviour.FindAnyObjectByType<UnitConfig>();
+        _buffs = new Dictionary<BaseUnitBrain, IBuff>();
+        _baseStates = modifers;
         _currentStates = _baseStates;
         Debug.Log("Create Service Buffs");
-
-        Debug.Log(_currentStates);
     }
 
     public void AddBuff(BaseUnitBrain unit, IBuff buff)
     {
         _buffs.Add(unit, buff);
+        Debug.Log($"Бафф {buff} юнита {unit} добавлен");
     }
 
-    public void RemoveBuff(BaseUnitBrain unit, IBuff buff)
+    public void RemoveBuff(BaseUnitBrain unit)
     {
         _buffs.Remove(unit); // удаление по ключу
+        Debug.Log($"Бафф юнита {unit} Removed");
     }
 
     private void ApplyBuffs()

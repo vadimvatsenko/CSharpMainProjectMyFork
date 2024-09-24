@@ -7,6 +7,7 @@ using UnitBrains;
 using UnitBrains.Pathfinding;
 using UnityEngine;
 using Utilities;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace Model.Runtime
 {
@@ -27,8 +28,18 @@ namespace Model.Runtime
         private float _nextMoveTime = 0f;
         private float _nextAttackTime = 0f;
 
-        //
-        private BuffService _buffService => ServiceLocator.Get<BuffService>();
+        // ДЗ-12
+        private BuffService _buffService => ServiceLocator.Get<BuffService>(); // ссылка на систему
+        private Modifers _unitModifers; // ссылка на модификаторы
+
+        private List<IBuff> _buffsList = new List<IBuff> // список из баффов
+        {
+            new MoveFasterBuff(Random.Range(100, 150)), // быстрей
+            new ShootFasterBuff(Random.Range(100, 150)), // быстрей
+            new MoveFasterBuff(Random.Range(0, 100)), // медленней
+            new ShootFasterBuff(Random.Range(0, 100)), // медленней
+        };
+        
         //
 
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
@@ -39,10 +50,29 @@ namespace Model.Runtime
             _brain = UnitBrainProvider.GetBrain(config);
             _brain.SetUnit(this, recommendationsForUnitsSingleton); // 5.добавлена зависимость
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
+
+            // ДЗ-12
+
+            _unitModifers = new Modifers() // создаю модификаторы для юнита
+            {
+                AttackAcceleration = this.Config.AttackDelay,
+                MovementAcceleration = this.Config.MoveDelay,
+                MovementSlowing = this.Config.MoveDelay,
+                AttackSlowdown = this.Config.AttackDelay,
+            };
+
+            ApplyRandomBuff();
+        }
+
+        private void ApplyRandomBuff()
+        {
+            var randomBuff = _buffsList[Random.Range(0, _buffsList.Count)];
+            _buffService.AddBuff(_brain, randomBuff);
         }
 
         public void Update(float deltaTime, float time)
         {
+            
             if (IsDead)
                 return;
             
@@ -54,15 +84,23 @@ namespace Model.Runtime
             
             if (_nextMoveTime < time)
             {
-               
-                _nextMoveTime = time + Config.MoveDelay;
+
+                IBuff moveSpeedBuff = _buffService._buffs[_brain];
+                float moveSpeed = moveSpeedBuff.ApplyBuff(_unitModifers).MovementAcceleration;
+
+                Debug.Log($"default speed {Config.MoveDelay} vs MoveSpeed {moveSpeed}");
+                //_nextMoveTime = time + Config.MoveDelay;
+                _nextMoveTime = time + moveSpeed;
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
-                float timeScaller = _buffService.AddBuff(this, new MoveFasterBuff(10));
+                float shootSpeed = _unitModifers.AttackAcceleration;
+                //Debug.Log($"default shoot {Config.AttackDelay} vs shootSpeed {shootSpeed}");
                 _nextAttackTime = time + Config.AttackDelay;
+                //_nextAttackTime = time + shootSpeed;
+                
             }
         }
 
