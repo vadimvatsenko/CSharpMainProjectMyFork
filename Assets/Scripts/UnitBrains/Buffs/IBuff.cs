@@ -1,9 +1,8 @@
-using Model.Config;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IBuff 
+public interface IBuff
 {
-    Modifers ApplyBuff(Modifers config);
+    public void ApplyBuff(CharacterStats stats);
 }

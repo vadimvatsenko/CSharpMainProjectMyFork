@@ -40,7 +40,7 @@ namespace Controller
             _rootView.ShowStartMenu();
 
             // запись системы
-            _buffService = new BuffService(new Modifers());
+            _buffService = new BuffService(new CharacterStats());
             ServiceLocator.Register(_buffService);
         }
 

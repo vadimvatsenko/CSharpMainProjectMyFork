@@ -4,17 +4,10 @@ using UnityEngine;
 
 public class ShootFasterBuff : IBuff
 {
-    private float _indexSpeed;
-
-    public ShootFasterBuff(float indexSpeed)
+    public void ApplyBuff(CharacterStats stats)
     {
-        _indexSpeed = indexSpeed;
+        CharacterStats newStats = stats;
+        newStats.shootSpeed *= 2;
     }
 
-    public Modifers ApplyBuff(Modifers config)
-    {
-        Modifers newConfig = config;
-        newConfig.AttackAcceleration += _indexSpeed;
-        return newConfig;
-    }
 }

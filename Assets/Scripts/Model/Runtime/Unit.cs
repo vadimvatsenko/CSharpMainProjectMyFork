@@ -30,17 +30,8 @@ namespace Model.Runtime
 
         // ДЗ-12
         private BuffService _buffService => ServiceLocator.Get<BuffService>(); // ссылка на систему
-        private Modifers _unitModifers; // ссылка на модификаторы
-
-        private List<IBuff> _buffsList = new List<IBuff> // список из баффов
-        {
-            new MoveFasterBuff(Random.Range(100, 150)), // быстрей
-            new ShootFasterBuff(Random.Range(100, 150)), // быстрей
-            new MoveFasterBuff(Random.Range(0, 100)), // медленней
-            new ShootFasterBuff(Random.Range(0, 100)), // медленней
-        };
+        private CharacterStats _stats; // ссылка на статы
         
-        //
 
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
         {
@@ -52,22 +43,24 @@ namespace Model.Runtime
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
 
             // ДЗ-12
+            _stats = new CharacterStats(this.Config.MoveDelay, this.Config.AttackDelay); // создаю модификаторы для юнита            
 
-            _unitModifers = new Modifers() // создаю модификаторы для юнита
-            {
-                AttackAcceleration = this.Config.AttackDelay,
-                MovementAcceleration = this.Config.MoveDelay,
-                MovementSlowing = this.Config.MoveDelay,
-                AttackSlowdown = this.Config.AttackDelay,
-            };
-
-            ApplyRandomBuff();
+            _buffService.AddBuff(_brain, RandomBuff());
         }
 
-        private void ApplyRandomBuff()
+        // ДЗ-12
+        private IBuff RandomBuff()
         {
-            var randomBuff = _buffsList[Random.Range(0, _buffsList.Count)];
-            _buffService.AddBuff(_brain, randomBuff);
+            List<IBuff> buffsList = new List<IBuff>()
+            {
+                new MoveFasterBuff(),
+                new MoveFasterBuff(),
+                new ShootFasterBuff(),
+                new MoveSlowlyBuff(),
+            };
+
+            IBuff buff = buffsList[Random.Range(0, buffsList.Count)];
+            return buff;
         }
 
         public void Update(float deltaTime, float time)
@@ -84,23 +77,18 @@ namespace Model.Runtime
             
             if (_nextMoveTime < time)
             {
-
-                IBuff moveSpeedBuff = _buffService._buffs[_brain];
-                float moveSpeed = moveSpeedBuff.ApplyBuff(_unitModifers).MovementAcceleration;
-
-                Debug.Log($"default speed {Config.MoveDelay} vs MoveSpeed {moveSpeed}");
+                // 
                 //_nextMoveTime = time + Config.MoveDelay;
-                _nextMoveTime = time + moveSpeed;
+                
+                _nextMoveTime = time + _buffService._currentStates.moveSpeed;
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
-                float shootSpeed = _unitModifers.AttackAcceleration;
-                //Debug.Log($"default shoot {Config.AttackDelay} vs shootSpeed {shootSpeed}");
-                _nextAttackTime = time + Config.AttackDelay;
-                //_nextAttackTime = time + shootSpeed;
-                
+                //
+                //_nextAttackTime = time + Config.AttackDelay;               
+                _nextAttackTime = time + _buffService._currentStates.shootSpeed;               
             }
         }
 

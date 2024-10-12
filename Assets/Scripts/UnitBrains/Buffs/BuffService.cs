@@ -4,43 +4,35 @@ using System.Collections.Generic;
 using UnitBrains;
 using UnityEngine;
 
-/*- ускорение передвижения,
-- ускорение атаки,
-- замедление передвижения,
-- замедление атаки*/
-
 public class BuffService: IBuffable
 {
-    public Modifers _baseStates { get; }
-    public Modifers _currentStates { get; private set; }
+    public CharacterStats _baseStates { get; }
+    public CharacterStats _currentStates { get; private set; }
     public Dictionary<BaseUnitBrain, IBuff> _buffs {  get; private set; }
-    public BuffService(Modifers modifers)
+    public BuffService(CharacterStats stats)
     {
         _buffs = new Dictionary<BaseUnitBrain, IBuff>();
-        _baseStates = modifers;
+        _baseStates = stats;
         _currentStates = _baseStates;
         Debug.Log("Create Service Buffs");
     }
-
-    public void AddBuff(BaseUnitBrain unit, IBuff buff)
+    public void AddBuff(BaseUnitBrain brain, IBuff buff)
     {
-        _buffs.Add(unit, buff);
-        Debug.Log($"Бафф {buff} юнита {unit} добавлен");
+        if(!_buffs.ContainsKey(brain)) _buffs.Add(brain, buff);
     }
 
-    public void RemoveBuff(BaseUnitBrain unit)
+    public void RemoveBuff(BaseUnitBrain brain)
     {
-        _buffs.Remove(unit); // удаление по ключу
-        Debug.Log($"Бафф юнита {unit} Removed");
+        _buffs.Remove(brain);
     }
 
     private void ApplyBuffs()
     {
         _currentStates = _baseStates;
 
-        foreach(var buff in _buffs)
+        foreach (var buff in _buffs.Values)
         {
-            _currentStates = buff.Value.ApplyBuff(_currentStates);
+            buff.ApplyBuff(_currentStates);
         }
     }
 }

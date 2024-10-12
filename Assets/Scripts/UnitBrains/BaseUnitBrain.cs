@@ -14,18 +14,14 @@ namespace UnitBrains
     {
         public virtual string TargetUnitName => string.Empty;
         public virtual bool IsPlayerUnitBrain => true;
-        public virtual BaseUnitPath ActivePath => _activePath;
-        
+        public virtual BaseUnitPath ActivePath => _activePath;        
         protected Unit unit { get; private set; }
         protected IReadOnlyRuntimeModel runtimeModel => ServiceLocator.Get<IReadOnlyRuntimeModel>();
         private BaseUnitPath _activePath = null;
 
         protected RecommendationsForUnitsSingleton _recommendationsForUnitsSingleton; // 6. Создано поле локатора, его унаследует DefaultPlayerUnitBrain
 
-        protected Modifers _unitModifers;
         protected BuffService _buffService;
-
-
 
         private readonly Vector2[] _projectileShifts = new Vector2[]
         {
@@ -71,9 +67,6 @@ namespace UnitBrains
         {
             this.unit = unit;
             _recommendationsForUnitsSingleton = recommendationsForUnitsSingleton; // 8. Записываем локатор
-
-
-            
         }
 
         public virtual void Update(float deltaTime, float time)
