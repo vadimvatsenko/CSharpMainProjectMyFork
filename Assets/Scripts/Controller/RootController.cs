@@ -14,6 +14,7 @@ namespace Controller
         private readonly RuntimeModel _runtimeModel;
         private readonly LevelController _levelController;
         
+        // ДЗ-12
         private readonly BuffService _buffService;
         
         private RootView _rootView;
@@ -39,8 +40,10 @@ namespace Controller
             
             _rootView.ShowStartMenu();
 
-            // запись системы
-            _buffService = new BuffService(new CharacterStats());
+            // запись системы // ДЗ-12
+            UnitConfig unitConfig = new UnitConfig();
+            TimeUtil timeUtil = ServiceLocator.Get<TimeUtil>();
+            _buffService = new BuffService(new CharacterStats(unitConfig.MoveDelay, unitConfig.AttackDelay), timeUtil);
             ServiceLocator.Register(_buffService);
         }
 

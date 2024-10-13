@@ -1,38 +1,56 @@
-using Model.Config;
-using System.Collections;
 using System.Collections.Generic;
 using UnitBrains;
 using UnityEngine;
+using Utilities;
 
 public class BuffService: IBuffable
 {
-    public CharacterStats _baseStates { get; }
-    public CharacterStats _currentStates { get; private set; }
-    public Dictionary<BaseUnitBrain, IBuff> _buffs {  get; private set; }
-    public BuffService(CharacterStats stats)
+    public CharacterStats _baseStats { get; private set; }
+
+    private TimeUtil _timeUtil;
+    public Dictionary<string, CharacterStats> _buffs {  get; private set; }
+    public BuffService(CharacterStats stats, TimeUtil timeUtil)
     {
-        _buffs = new Dictionary<BaseUnitBrain, IBuff>();
-        _baseStates = stats;
-        _currentStates = _baseStates;
+        _buffs = new Dictionary<string, CharacterStats>();
+        _baseStats = stats;
+        _timeUtil = timeUtil;
         Debug.Log("Create Service Buffs");
     }
-    public void AddBuff(BaseUnitBrain brain, IBuff buff)
+
+    public void AddStats(string Id, CharacterStats stats)
     {
-        if(!_buffs.ContainsKey(brain)) _buffs.Add(brain, buff);
+        if (!_buffs.ContainsKey(Id)) 
+            _buffs[Id] = stats;      
     }
 
-    public void RemoveBuff(BaseUnitBrain brain)
+    public void ResetStats(string Id)
     {
-        _buffs.Remove(brain);
-    }
-
-    private void ApplyBuffs()
-    {
-        _currentStates = _baseStates;
-
-        foreach (var buff in _buffs.Values)
+        if(_buffs.ContainsKey(Id))
         {
-            buff.ApplyBuff(_currentStates);
+            _buffs[Id] = _baseStats;
         }
+    }
+
+    public void TempBuff(string Id, CharacterStats stats, float delay)
+    {
+        AddStats(Id, stats);
+        Debug.Log("Add Buffs");
+
+        _timeUtil.RunDelayed(delay, () =>
+        {
+            ResetStats(Id);
+            Debug.Log("Reset Buffs");
+        });
+        
+    }
+
+    // Метод для получения баффа по ID юнита
+    public CharacterStats? GetBuffByUnitID(string Id)
+    {
+        if (_buffs.TryGetValue(Id, out CharacterStats stats))
+        {
+            return stats; 
+        }
+        return null; 
     }
 }

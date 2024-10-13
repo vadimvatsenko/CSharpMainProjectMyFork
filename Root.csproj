@@ -95,7 +95,6 @@
     <Compile Include="Assets\Scripts\Utilities\TimeUtil.cs" />
     <Compile Include="Assets\Scripts\Controller\LevelController.cs" />
     <Compile Include="Assets\Scripts\Model\Runtime\ReadOnly\IReadOnlyProjectile.cs" />
-    <Compile Include="Assets\Scripts\UnitBrains\Buffs\TemporaryBuff.cs" />
     <Compile Include="Assets\Scripts\UnitBrains\Enemy\DefaultEnemyUnitBrain.cs" />
     <Compile Include="Assets\Scripts\View\ProjectileView.cs" />
     <Compile Include="Assets\Scripts\View\StartMenuView.cs" />
@@ -114,6 +113,7 @@
     <Compile Include="Assets\Scripts\Model\Runtime\Unit.cs" />
     <Compile Include="Assets\Scripts\Model\IReadOnlyRuntimeModel.cs" />
     <Compile Include="Assets\Scripts\UnitBrains\Buffs\ShootFasterBuff.cs" />
+    <Compile Include="Assets\Scripts\UnitBrains\Buffs\IDGenerator.cs" />
     <Compile Include="Assets\Scripts\Model\Runtime\Projectiles\HorizontalLineProjectile.cs" />
     <Compile Include="Assets\Scripts\Model\Runtime\Projectiles\HomingProjectile.cs" />
     <Compile Include="Assets\Scripts\Utilities\MapGenerator.cs" />

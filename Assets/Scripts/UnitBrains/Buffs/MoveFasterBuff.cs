@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class MoveFasterBuff : IBuff
 {
-    public void ApplyBuff(CharacterStats stats)
+    public CharacterStats ApplyBuff(CharacterStats stats)
     {
-        CharacterStats newStats = stats;
-        newStats.moveSpeed *= 2;
+        return new CharacterStats(stats.moveSpeed * 2, stats.shootSpeed);
     }
 }

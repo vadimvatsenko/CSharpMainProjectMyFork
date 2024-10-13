@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnitBrains;
 using UnityEngine;
 
+// Done
 public interface IBuffable
 {
-    public void AddBuff(BaseUnitBrain brain, IBuff buff);
-    public void RemoveBuff(BaseUnitBrain brain);
+    public void AddStats(string Id, CharacterStats stats);
+    public void ResetStats(string Id);
 }

@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShootSlowlyBuff : IBuff
+public class ShootSlowlyBuff: IBuff
 {
-    public void ApplyBuff(CharacterStats stats)
+    public CharacterStats ApplyBuff(CharacterStats stats)
     {
-        CharacterStats newStats = stats;
-        newStats.shootSpeed /= 2;
-    }
+        return new CharacterStats(stats.moveSpeed, stats.shootSpeed / 2);
+    }    
 }

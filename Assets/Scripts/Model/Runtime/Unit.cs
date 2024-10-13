@@ -13,6 +13,7 @@ namespace Model.Runtime
 {
     public class Unit : IReadOnlyUnit
     {
+        public string UnitID;
         public UnitConfig Config { get; }
         public Vector2Int Pos { get; private set; }
         public int Health { get; private set; }
@@ -30,11 +31,10 @@ namespace Model.Runtime
 
         // ДЗ-12
         private BuffService _buffService => ServiceLocator.Get<BuffService>(); // ссылка на систему
-        private CharacterStats _stats; // ссылка на статы
         
-
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
         {
+            UnitID = IDGenerator.GenerateStringID(10);
             Config = config;
             Pos = startPos;
             Health = config.MaxHealth;
@@ -42,24 +42,25 @@ namespace Model.Runtime
             _brain.SetUnit(this, recommendationsForUnitsSingleton); // 5.добавлена зависимость
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
 
-            // ДЗ-12
-            _stats = new CharacterStats(this.Config.MoveDelay, this.Config.AttackDelay); // создаю модификаторы для юнита            
-
-            _buffService.AddBuff(_brain, RandomBuff());
+            // ДЗ-12                       
+            _buffService.TempBuff(UnitID, RandomBuff(), 10f); // баффы только на своего юнита
         }
 
         // ДЗ-12
-        private IBuff RandomBuff()
+        private CharacterStats RandomBuff()
         {
-            List<IBuff> buffsList = new List<IBuff>()
+
+            List<CharacterStats> buffsList = new List<CharacterStats>()
             {
-                new MoveFasterBuff(),
-                new MoveFasterBuff(),
-                new ShootFasterBuff(),
-                new MoveSlowlyBuff(),
+                new MoveFasterBuff().ApplyBuff(_buffService._baseStats),
+                new MoveSlowlyBuff().ApplyBuff(_buffService._baseStats),
+                new ShootFasterBuff().ApplyBuff(_buffService._baseStats),
+                new ShootSlowlyBuff().ApplyBuff(_buffService._baseStats),
+
+                
             };
 
-            IBuff buff = buffsList[Random.Range(0, buffsList.Count)];
+            CharacterStats buff = buffsList[Random.Range(0, buffsList.Count)];
             return buff;
         }
 
@@ -77,18 +78,19 @@ namespace Model.Runtime
             
             if (_nextMoveTime < time)
             {
-                // 
-                //_nextMoveTime = time + Config.MoveDelay;
                 
-                _nextMoveTime = time + _buffService._currentStates.moveSpeed;
+                //_nextMoveTime = time + Config.MoveDelay;
+                // Применение баффа // ДЗ-12
+                _nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
-                //
-                //_nextAttackTime = time + Config.AttackDelay;               
-                _nextAttackTime = time + _buffService._currentStates.shootSpeed;               
+
+                //_nextAttackTime = time + Config.AttackDelay;
+                // Применение баффа // ДЗ-12
+                _nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;       
             }
         }
 
