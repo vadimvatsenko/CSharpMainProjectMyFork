@@ -67,6 +67,7 @@ namespace UnitBrains
         {
             this.unit = unit;
             _recommendationsForUnitsSingleton = recommendationsForUnitsSingleton; // 8. Записываем локатор
+            _buffService = ServiceLocator.Get<BuffService>();
         }
 
         public virtual void Update(float deltaTime, float time)

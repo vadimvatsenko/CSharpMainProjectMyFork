@@ -13,7 +13,7 @@ namespace Model.Runtime
 {
     public class Unit : IReadOnlyUnit
     {
-        public string UnitID;
+        public string UnitID { get; private set; }
         public UnitConfig Config { get; }
         public Vector2Int Pos { get; private set; }
         public int Health { get; private set; }
@@ -30,7 +30,7 @@ namespace Model.Runtime
         private float _nextAttackTime = 0f;
 
         // ДЗ-12
-        private BuffService _buffService => ServiceLocator.Get<BuffService>(); // ссылка на систему
+         // ссылка на систему
         
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
         {
@@ -41,27 +41,7 @@ namespace Model.Runtime
             _brain = UnitBrainProvider.GetBrain(config);
             _brain.SetUnit(this, recommendationsForUnitsSingleton); // 5.добавлена зависимость
             _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
-
-            // ДЗ-12                       
-            _buffService.TempBuff(UnitID, RandomBuff(), 10f); // баффы только на своего юнита
-        }
-
-        // ДЗ-12
-        private CharacterStats RandomBuff()
-        {
-
-            List<CharacterStats> buffsList = new List<CharacterStats>()
-            {
-                new MoveFasterBuff().ApplyBuff(_buffService._baseStats),
-                new MoveSlowlyBuff().ApplyBuff(_buffService._baseStats),
-                new ShootFasterBuff().ApplyBuff(_buffService._baseStats),
-                new ShootSlowlyBuff().ApplyBuff(_buffService._baseStats),
-
-                
-            };
-
-            CharacterStats buff = buffsList[Random.Range(0, buffsList.Count)];
-            return buff;
+                                
         }
 
         public void Update(float deltaTime, float time)
@@ -79,18 +59,15 @@ namespace Model.Runtime
             if (_nextMoveTime < time)
             {
                 
-                //_nextMoveTime = time + Config.MoveDelay;
-                // Применение баффа // ДЗ-12
-                _nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
+                _nextMoveTime = time + Config.MoveDelay;                
+                //_nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
-
-                //_nextAttackTime = time + Config.AttackDelay;
-                // Применение баффа // ДЗ-12
-                _nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;       
+                _nextAttackTime = time + Config.AttackDelay;              
+                //_nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;       
             }
         }
 
