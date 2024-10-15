@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Model;
 using Model.Runtime.Projectiles;
+using Model.Runtime.ReadOnly;
 using UnitBrains.Pathfinding;
 using UnityEngine;
 using Utilities;
@@ -20,26 +21,26 @@ namespace UnitBrains.Player
         private BaseUnitPath _activePath;
 
         // ДЗ-13
-        private bool _isBuffble = false;
         VFXView _vfxView => ServiceLocator.Get<VFXView>();
         
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
         {
             float overheatTemperature = OverheatTemperature;
-            ///////////////////////////////////////
-            // Homework 1.3 (1st block, 3rd module)
-            ///////////////////////////////////////           
+                  
             var projectile = CreateProjectile(forTarget);
-            //AddProjectileToList(projectile, intoList);
+            
             // ДЗ-13 убрал projectile, он не должен стрелять
             List<BaseProjectile> projecttilesForThisUnit = new List<BaseProjectile>();
             AddProjectileToList(projectile, projecttilesForThisUnit);
-            ///////////////////////////////////////
+           
         }
 
         public override Vector2Int GetNextStep()
         {
-            return base.GetNextStep();
+            var target = runtimeModel.RoMap.Bases[IsPlayerUnitBrain ? RuntimeModel.BotPlayerId : RuntimeModel.PlayerId];
+
+            _activePath = new DummyUnitPath(runtimeModel, unit.Pos, runtimeModel.RoMap.Bases[RuntimeModel.PlayerId]);
+            return _activePath.GetNextStepFrom(unit.Pos);
         }
 
         protected override List<Vector2Int> SelectTargets()
@@ -67,11 +68,24 @@ namespace UnitBrains.Player
             }
 
             // ДЗ-13
-            if (HasTargetsInRange() && !_isBuffble)
+            /* if (HasTargetsInRange() && !_isBuffble)
+             {
+                 _isBuffble = true;
+                 _buffService.TempBuff(unit.UnitID, _buffService.GetRandomBuff(), 5f);
+                 _vfxView.PlayVFX(unit.Pos, VFXView.VFXType.BuffApplied);
+             }*/
+
+            List<IReadOnlyUnit> frienUnits = GetFriendlyUnit();
+
+            if(frienUnits.Count != 0)
             {
-                _isBuffble = true;
-                _buffService.TempBuff(unit.UnitID, RandomBuff(), 5f);
-                _vfxView.PlayVFX(unit.Pos, VFXView.VFXType.BuffApplied);
+                foreach (var u in frienUnits)
+                {
+                    if (u == this.unit) continue;
+                    
+                    _vfxView.PlayVFX(u.Pos, VFXView.VFXType.BuffApplied);
+                                      
+                }
             }
         }
 
@@ -87,21 +101,21 @@ namespace UnitBrains.Player
             if (_temperature >= OverheatTemperature) _overheated = true;
         }
 
-        private CharacterStats RandomBuff()
+        private List<IReadOnlyUnit> GetFriendlyUnit()
         {
+           
+            var units = new List<IReadOnlyUnit>();
+            var pos = unit.Pos;
 
-            List<CharacterStats> buffsList = new List<CharacterStats>()
+            foreach (var friedUnit in runtimeModel.RoPlayerUnits)
             {
-                new MoveFasterBuff().ApplyBuff(_buffService._baseStats),
-                new MoveSlowlyBuff().ApplyBuff(_buffService._baseStats),
-                new ShootFasterBuff().ApplyBuff(_buffService._baseStats),
-                new ShootSlowlyBuff().ApplyBuff(_buffService._baseStats),
-            };
+                if(Vector2Int.Distance(this.unit.Pos, friedUnit.Pos) < 2f)
+                {
+                    units.Add(friedUnit);
+                }
+            }
 
-            CharacterStats buff = buffsList[Random.Range(0, buffsList.Count)];
-            return buff;
+            return units;
         }
-
-        
     }
 }

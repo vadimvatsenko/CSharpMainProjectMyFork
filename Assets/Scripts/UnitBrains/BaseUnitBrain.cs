@@ -22,6 +22,7 @@ namespace UnitBrains
         protected RecommendationsForUnitsSingleton _recommendationsForUnitsSingleton; // 6. Создано поле локатора, его унаследует DefaultPlayerUnitBrain
 
         protected BuffService _buffService;
+        protected bool isBuffable = false;
 
         private readonly Vector2[] _projectileShifts = new Vector2[]
         {

@@ -53,4 +53,18 @@ public class BuffService: IBuffable
         }
         return null; 
     }
+
+    public CharacterStats GetRandomBuff()
+    {
+        List<CharacterStats> buffsList = new List<CharacterStats>()
+            {
+                new MoveFasterBuff().ApplyBuff(_baseStats),
+                new MoveSlowlyBuff().ApplyBuff(_baseStats),
+                new ShootFasterBuff().ApplyBuff(_baseStats),
+                new ShootSlowlyBuff().ApplyBuff(_baseStats),
+            };
+
+        CharacterStats buff = buffsList[Random.Range(0, buffsList.Count)];
+        return buff;
+    }
 }
