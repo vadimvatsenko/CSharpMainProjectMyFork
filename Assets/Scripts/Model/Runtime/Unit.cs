@@ -30,6 +30,8 @@ namespace Model.Runtime
         private float _nextAttackTime = 0f;
 
         private BuffService _buffService => ServiceLocator.Get<BuffService>();
+        private bool isBuffable = false;
+        
         
         
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
@@ -40,8 +42,7 @@ namespace Model.Runtime
             Health = config.MaxHealth;
             _brain = UnitBrainProvider.GetBrain(config);
             _brain.SetUnit(this, recommendationsForUnitsSingleton); // 5.добавлена зависимость
-            _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();
-                                
+            _runtimeModel = ServiceLocator.Get<IReadOnlyRuntimeModel>();                                
         }
 
         public void Update(float deltaTime, float time)
@@ -59,15 +60,20 @@ namespace Model.Runtime
             if (_nextMoveTime < time)
             {
                 
-                //_nextMoveTime = time + Config.MoveDelay;                
-                _nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
+               
+                //_nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
+                _nextMoveTime = time + Config.MoveDelay;
+
+              
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
-                //_nextAttackTime = time + Config.AttackDelay;              
-                _nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;       
+                _nextAttackTime = time + Config.AttackDelay;
+               
+                //_nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;       
+
             }
         }
 
@@ -112,7 +118,10 @@ namespace Model.Runtime
 
         public void TakeBuff()
         {
+            if(!isBuffable)
             _buffService.TempBuff(UnitID, _buffService.GetRandomBuff(), 5f);
+
+            isBuffable = true;
         }
     }
 }

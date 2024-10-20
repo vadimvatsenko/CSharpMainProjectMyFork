@@ -10,5 +10,6 @@ namespace Model.Runtime.ReadOnly
         public Vector2Int Pos { get; } // позиция юнита
         public int Health { get; } // здоровье юнита
         public BaseUnitPath ActivePath { get; }
+        public string UnitID {  get; } // ДЗ 13
     }
 }
