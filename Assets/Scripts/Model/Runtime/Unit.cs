@@ -31,9 +31,7 @@ namespace Model.Runtime
 
         private BuffService _buffService => ServiceLocator.Get<BuffService>();
         private bool isBuffable = false;
-        
-        
-        
+                
         public Unit(UnitConfig config, Vector2Int startPos, RecommendationsForUnitsSingleton recommendationsForUnitsSingleton) // 4. добавлена зависимость
         {
             UnitID = IDGenerator.GenerateStringID(10);
@@ -59,21 +57,27 @@ namespace Model.Runtime
             
             if (_nextMoveTime < time)
             {
-                
-               
-                //_nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
-                _nextMoveTime = time + Config.MoveDelay;
 
-              
+                if(_buffService._buffs.ContainsKey(this.UnitID))
+                {
+                    _nextMoveTime = time + _buffService._buffs[UnitID].moveSpeed;
+                } else
+                {
+                    _nextMoveTime = time + Config.MoveDelay;
+                }
+                              
                 Move();
             }
             
             if (_nextAttackTime < time && Attack())
             {
-                _nextAttackTime = time + Config.AttackDelay;
-               
-                //_nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;       
-
+                if (_buffService._buffs.ContainsKey(this.UnitID))
+                {
+                    _nextAttackTime = time + _buffService._buffs[UnitID].shootSpeed;
+                } else
+                {
+                    _nextAttackTime = time + Config.AttackDelay;
+                }
             }
         }
 

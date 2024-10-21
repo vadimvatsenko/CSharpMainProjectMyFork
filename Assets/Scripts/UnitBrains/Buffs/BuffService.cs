@@ -34,8 +34,7 @@ public class BuffService: IBuffable
     public void TempBuff(string Id, CharacterStats stats, float delay)
     {
         AddStats(Id, stats);
-        Debug.Log("Add Buffs");
-
+        
         _timeUtil.RunDelayed(delay, () =>
         {
             ResetStats(Id);

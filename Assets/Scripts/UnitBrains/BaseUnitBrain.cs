@@ -21,6 +21,7 @@ namespace UnitBrains
 
         protected RecommendationsForUnitsSingleton _recommendationsForUnitsSingleton; // 6. Создано поле локатора, его унаследует DefaultPlayerUnitBrain
 
+        // HM13
         protected BuffService _buffService;
         protected bool isBuffable = false;
 
