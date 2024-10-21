@@ -27,7 +27,8 @@ public class BuffService: IBuffable
     {
         if(_buffs.ContainsKey(Id))
         {
-            _buffs[Id] = _baseStats;
+            //_buffs[Id] = _baseStats;
+            _buffs.Remove(Id);
         }
     }
 

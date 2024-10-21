@@ -27,11 +27,12 @@ namespace UnitBrains.Player
         // HW 13
         VFXView _vfxView => ServiceLocator.Get<VFXView>();
         TimeUtil _timeUtil => ServiceLocator.Get<TimeUtil>();
-        bool _isTargetBaseEnemy = true;
-        bool _isFrendlyUnitsInRange = false;
-        private bool isPaused = false;
+        private bool _isTargetBaseEnemy = true;
+        private bool _isFrendlyUnitsInRange = false;
+        private bool _isPaused = false;
+        private bool _isActiveBuffUnit = false;
         Vector2Int _targetBasePosition = Vector2Int.zero;
-        public event Action OnChangePause;
+        List<IReadOnlyUnit> _friendUnits = new List<IReadOnlyUnit>();
         //
 
         protected override void GenerateProjectiles(Vector2Int forTarget, List<BaseProjectile> intoList)
@@ -42,6 +43,8 @@ namespace UnitBrains.Player
         // HW 13
         public override Vector2Int GetNextStep()
         {
+            if (!_isActiveBuffUnit) return unit.Pos;
+
             if (_isTargetBaseEnemy)
             {
                 _targetBasePosition = runtimeModel.RoMap.Bases[RuntimeModel.BotPlayerId];
@@ -49,23 +52,34 @@ namespace UnitBrains.Player
             {
                 _targetBasePosition = runtimeModel.RoMap.Bases[RuntimeModel.PlayerId];
             }
-            
-            
+                       
             if (Vector2Int.Distance(unit.Pos, _targetBasePosition) <= 2f)
             {
                 _isTargetBaseEnemy = !_isTargetBaseEnemy;
             }
 
-            if (_isFrendlyUnitsInRange)
+            if (_isFrendlyUnitsInRange && !_isPaused)
             {
+                _isPaused = true;
                 _timeUtil.RunDelayed(0.5f, () =>
                 {
-                    Debug.Log("IsPause");                    
+                    _isPaused = false;
+                    Debug.Log($"Пауза завершена - {_isPaused}");
                 });
+
+                _activePath = new AStarPathFinding(runtimeModel, unit.Pos, _targetBasePosition);
+                return _activePath.GetNextStepFrom(unit.Pos);
             }
 
-            _activePath = new AStarPathFinding(runtimeModel, unit.Pos, _targetBasePosition);
-            return _activePath.GetNextStepFrom(unit.Pos);
+            if(!_isPaused)
+            {
+                _activePath = new AStarPathFinding(runtimeModel, unit.Pos, _targetBasePosition);
+                return _activePath.GetNextStepFrom(unit.Pos);
+            } 
+            else
+            {
+                return unit.Pos;                      
+            }
         }
 
         protected override List<Vector2Int> SelectTargets()
@@ -81,16 +95,20 @@ namespace UnitBrains.Player
 
         public override void Update(float deltaTime, float time)
         {
-            
-            List<IReadOnlyUnit> friendUnits = GetFriendlyUnit();
+            _timeUtil.RunDelayed(3f, () =>
+                {
+                    _isActiveBuffUnit = true;
+                }); 
 
-            if(friendUnits.Count != 0)
+            _friendUnits = GetFriendlyUnit();
+
+            if(_friendUnits.Count != 0 && _isActiveBuffUnit)
             {
-                foreach (var u in friendUnits)
+                foreach (var u in _friendUnits)
                 {                   
-                    if (u == this.unit) continue;
+                    if (u == this.unit || _buffService._buffs.ContainsKey(u.UnitID)) continue; // если юнит является самим собой, или юнит уже под баффом, пропускаем
 
-                    _buffService.TempBuff(u.UnitID, _buffService.GetRandomBuff(), 10f);
+                    _buffService.TempBuff(u.UnitID, _buffService.GetRandomBuff(), 3f);
                     _vfxView.PlayVFX(u.Pos, VFXView.VFXType.BuffApplied);                                     
                 }
             }
