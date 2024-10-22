@@ -6,6 +6,6 @@ public class MoveFasterBuff : IBuff
 {
     public CharacterStats ApplyBuff(CharacterStats stats)
     {
-        return new CharacterStats(stats.moveSpeed * 2, stats.shootSpeed);
+        return new CharacterStats(stats.moveSpeed * 20, stats.shootSpeed);
     }
 }

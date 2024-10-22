@@ -6,6 +6,6 @@ public class ShootSlowlyBuff: IBuff
 {
     public CharacterStats ApplyBuff(CharacterStats stats)
     {
-        return new CharacterStats(stats.moveSpeed, stats.shootSpeed / 2);
+        return new CharacterStats(stats.moveSpeed, stats.shootSpeed / 20);
     }    
 }
